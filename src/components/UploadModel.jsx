@@ -1,15 +1,29 @@
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { storage } from '../firebase';
+import { auth, storage, db } from '../firebase';
 
-function UploadModelPage() {
+function UploadModel() {
   const [file, setFile] = useState(null);
   const [downloadUrl, setDownloadUrl] = useState('');
   const [progress, setProgress] = useState(0);
-  console.log('file', file);
+
   const handleFileUpload = () => {
     if (!file) {
       alert('Please select a file first!');
+      return;
+    }
+    const fileExtension = file.name
+      .slice(file.name.lastIndexOf('.'))
+      .toLowerCase();
+    if (fileExtension !== '.glb') {
+      alert('Only .glb models are allowed for now.');
+      setFile(null);
+      return;
+    }
+    const user = auth.currentUser;
+    if (!user) {
+      alert('You need to be logged in to upload files.');
       return;
     }
     const storageRef = ref(storage, `/${file.name}`);
@@ -28,13 +42,24 @@ function UploadModelPage() {
         const url = await getDownloadURL(uploadTask.snapshot.ref);
         setDownloadUrl(url);
         console.log('file available at', url);
+        // Save metadata to Firestore
+        try {
+          await addDoc(collection(db, 'files'), {
+            fileName: file.name,
+            fileURL: url,
+            userId: user.uid,
+            uploadedAt: serverTimestamp(),
+          });
+          console.log('File metadata saved to Firestore.');
+        } catch (error) {
+          console.error('Error saving file metadata:', error);
+        }
       }
     );
   };
 
   return (
     <>
-      <h1 className='text-4xl font-semibold text-center'>Upload Model Page</h1>
       <div className='w-full flex justify-center gap-4 mt-4'>
         <label htmlFor='model'>Upload model image (glb format)</label>
         <label className='flex items-center justify-center w-full max-w-xs px-4 py-2 text-white bg-blue-600 rounded-lg cursor-pointer hover:bg-blue-700 transition-all'>
@@ -66,4 +91,4 @@ function UploadModelPage() {
   );
 }
 
-export default UploadModelPage;
+export default UploadModel;
