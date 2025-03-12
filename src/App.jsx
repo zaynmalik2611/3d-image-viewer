@@ -9,9 +9,7 @@ import UserDashboard from './pages/UserDashboard';
 function App() {
   return (
     <>
-      {/* CHORE: add an env and save sensitive information in the env */}
       {/* CHORE: understand the firebase security settings and configure the values */}
-      {/* CHORE: add authentication */}
       {/* TODO: improve the UI of the app */}
       {/* CHORE: add 404 fallback page */}
       <Routes>
