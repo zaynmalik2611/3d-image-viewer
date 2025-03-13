@@ -11,23 +11,28 @@ import {
 } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { deleteObject } from 'firebase/storage';
+import { getAuth, signOut } from 'firebase/auth';
 
 function UserDashboard() {
   const [userFiles, setUserFiles] = useState([]);
   const [refresh, setRefresh] = useState(0);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  console.log('hello');
+
   const listUserFiles = async () => {
-    const user = auth.currentUser;
-    setUser(user);
-    if (!user) {
+    const { currentUser } = auth;
+
+    setUser(currentUser);
+    if (!currentUser) {
       console.error('User not logged in');
       navigate('/auth');
       return;
     }
 
-    const q = query(collection(db, 'files'), where('userId', '==', user.uid));
+    const q = query(
+      collection(db, 'files'),
+      where('userId', '==', currentUser.uid)
+    );
 
     try {
       const querySnapshot = await getDocs(q);
@@ -58,6 +63,19 @@ function UserDashboard() {
       console.error('Error deleting file:', error);
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+      console.log('User signed out');
+      navigate('/auth');
+      // Optionally redirect or update UI here
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   console.log('files', userFiles);
 
   useEffect(() => {
@@ -65,20 +83,44 @@ function UserDashboard() {
       await listUserFiles();
     })();
   }, [refresh]);
+  console.log('user', user?.photoURL);
   return (
     <>
-      {/* <h2>User: {userName}</h2> */}
-      <button>Logout</button>
-      <UploadModel />
-      {/* list all files that this user has */}
-      {userFiles.map((file) => (
-        <div key={file.id}>
-          <Link to={`/models/${file.fileName}`}>
-            <h2>{file.fileName}</h2>
-          </Link>
-          <button onClick={() => handleDeleteFile(file)}>Delete</button>
+      <div className='flex justify-between p-4 bg-blue-500'>
+        <div className='flex items-center gap-2'>
+          <img
+            src={user?.photoURL}
+            alt='profile photo'
+            className='w-5 h-5 rounded-full '
+          />
+          <h2 className='text-white'>{user?.displayName}</h2>
         </div>
-      ))}
+        <button className='text-white cursor-pointer' onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+
+      <UploadModel />
+      <div className='p-2'>
+        {/* list all files that this user has */}
+        {userFiles.map((file) => (
+          <div key={file.id} className='flex items-center gap-2'>
+            <Link
+              className='text-cyan-600 font-semibold underline'
+              to={`/models/${file.fileName}`}
+            >
+              <h2>{file.fileName}</h2>
+            </Link>
+            <button
+              className='bg-red-500 text-white p-2 rounded-md'
+              onClick={() => handleDeleteFile(file)}
+            >
+              {/* TODO add trash icon */}
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
     </>
   );
 }

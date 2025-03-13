@@ -9,7 +9,7 @@ const PrivateRoute = () => {
 
   if (loading) return <p>Loading...</p>; // Optional: Show loading state
 
-  return user ? <Outlet /> : <Navigate to='/login' />;
+  return user ? <Outlet /> : <Navigate to='/auth' />;
 };
 
 export default PrivateRoute;

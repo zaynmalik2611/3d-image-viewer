@@ -60,9 +60,9 @@ function UploadModel() {
 
   return (
     <>
-      <div className='w-full flex justify-center gap-4 mt-4'>
+      <div className='w-full flex justify-center items-center gap-4 mt-4'>
         <label htmlFor='model'>Upload model image (glb format)</label>
-        <label className='flex items-center justify-center w-full max-w-xs px-4 py-2 text-white bg-blue-600 rounded-lg cursor-pointer hover:bg-blue-700 transition-all'>
+        <label className='flex items-center justify-center w-full max-w-40 px-4 py-2 text-white bg-blue-600 rounded-lg cursor-pointer hover:bg-blue-700 transition-all'>
           Choose File
           <input
             type='file'
@@ -72,21 +72,25 @@ function UploadModel() {
         </label>
 
         <button
-          className='bg-blue-500 text-white rounded-sm p-4'
+          className='bg-blue-600 text-white rounded-sm p-2'
           onClick={handleFileUpload}
         >
           Upload File
         </button>
       </div>
-      <div className='w-full max-w-sm bg-gray-200 rounded-full h-3'>
-        <div
-          className='bg-blue-600 h-3 rounded-full transition-all'
-          style={{ width: `${progress}%` }}
-        ></div>
+      <div className='flex justify-center mt-4'>
+        <div className='w-full max-w-sm'>
+          <div className=' bg-gray-200 rounded-full h-3'>
+            <div
+              className='bg-blue-600 h-3 rounded-full transition-all'
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          <p className='text-sm text-gray-600 mt-1 text-center'>
+            {progress.toFixed(2)}% uploaded
+          </p>
+        </div>
       </div>
-      <p className='text-sm text-gray-600 mt-1'>
-        {progress.toFixed(2)}% uploaded
-      </p>
     </>
   );
 }
