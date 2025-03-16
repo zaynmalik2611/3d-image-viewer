@@ -6,6 +6,7 @@ import {
   serverTimestamp,
   updateDoc,
 } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 import React, { useRef, useState } from 'react';
 import { auth, storage, db } from '../firebase';
 
@@ -72,7 +73,8 @@ function UploadModel() {
       alert('You need to be logged in to upload files.');
       return;
     }
-    const storageRef = ref(storage, `/${file.name}`);
+    const modelFileName = uuidv4() + fileExtension;
+    const storageRef = ref(storage, `/${modelFileName}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     const fileDownloadUrl = await uploadWithProgress(
@@ -81,6 +83,7 @@ function UploadModel() {
     );
     const savedFileDoc = await addDoc(collection(db, 'files'), {
       fileName: file.name,
+      modelName: modelFileName,
       fileURL: fileDownloadUrl,
       userId: user.uid,
       uploadedAt: serverTimestamp(),
@@ -88,7 +91,14 @@ function UploadModel() {
     });
 
     if (thumbnailFile) {
-      const thumbStorageRef = ref(storage, `/thumbnails/${thumbnailFile.name}`);
+      const thumbnailExtension = thumbnailFile.name
+        .slice(thumbnailFile.name.lastIndexOf('.'))
+        .toLowerCase();
+
+      const thumbStorageRef = ref(
+        storage,
+        `/thumbnails/${uuidv4() + thumbnailExtension}`
+      );
       const thumbUploadTask = uploadBytesResumable(
         thumbStorageRef,
         thumbnailFile
@@ -97,6 +107,7 @@ function UploadModel() {
         thumbUploadTask,
         setThumbnailProgress
       );
+      // TODO: add a thumbnail modelName to improve the delete functionality
       const docRef = doc(db, 'files', savedFileDoc.id);
       await updateDoc(docRef, {
         thumbnailUrl: thumbnailDownloadUrl,

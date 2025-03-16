@@ -18,7 +18,7 @@ function App() {
       {/* TODO: implement limits on usage */}
       <Routes>
         <Route path='/' element={<HomePage />} />
-        <Route path='/models/:modelName' element={<ModelViewerPage />} />
+        <Route path='/models/:fileId' element={<ModelViewerPage />} />
         <Route element={<PrivateRoute />}>
           <Route path='/dashboard' element={<UserDashboard />} />
         </Route>

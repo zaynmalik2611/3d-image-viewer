@@ -41,8 +41,6 @@ function HomePage() {
         <div></div>
       </div>
 
-      {/* TODO: list all the images name from the firebase */}
-      {/* TODO: show thumbnails of the images  */}
       {/* TODO: limit the image showing to 10 images */}
       {/* TODO: load more images by moving to the end of the page */}
       {/* TODO: add a loader when the images are loading */}
@@ -51,7 +49,7 @@ function HomePage() {
         {files.length ? (
           files.map((file, index) => (
             <div className='flex justify-center' key={index}>
-              <Link to={`/models/${file.fileName}`} className='flex flex-col'>
+              <Link to={`/models/${file.id}`} className='flex flex-col'>
                 <img
                   src={file.thumbnailUrl || '/public/assets/thumbnail.jpg'}
                   className='w-44 h-44'

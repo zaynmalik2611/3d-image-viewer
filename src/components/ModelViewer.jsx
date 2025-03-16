@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import '@google/model-viewer';
-import { storage, ref, getDownloadURL } from '../firebase';
-const ModelViewer = ({ modelName }) => {
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+const ModelViewer = ({ fileId }) => {
   const [glbUrl, setGlbUrl] = useState('');
-
+  console.log('fileId', fileId);
   async function fetchGLBFile() {
-    const fileRef = ref(storage, `/${modelName}`); // Adjust the path if needed
     try {
-      const url = await getDownloadURL(fileRef);
-      return url;
+      const docRef = doc(db, 'files', fileId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const fileDoc = docSnap.data();
+        return fileDoc?.fileURL ?? '';
+      } else {
+        return '';
+      }
     } catch (error) {
-      console.error('Error fetching GLB file:', error);
+      console.error('Error fetching a single file.', error);
       return '';
     }
   }

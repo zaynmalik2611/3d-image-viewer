@@ -52,8 +52,10 @@ function UserDashboard() {
   const handleDeleteFile = async (file) => {
     try {
       // Delete from Firebase Storage
-      const fileRef = ref(storage, `/${file.fileName}`);
+      const fileRef = ref(storage, `/${file.modelName}`);
       await deleteObject(fileRef);
+
+      const thumbnailRef = ref(storage, `/thumbnails/${file.thumbnail}`);
 
       // Delete metadata from Firestore
       await deleteDoc(doc(db, 'files', file.id));
@@ -112,7 +114,7 @@ function UserDashboard() {
           <div key={file.id} className='flex items-center gap-2'>
             <Link
               className='text-cyan-600 font-semibold underline'
-              to={`/models/${file.fileName}`}
+              to={`/models/${file.id}`}
             >
               <h2>{file.fileName}</h2>
             </Link>
