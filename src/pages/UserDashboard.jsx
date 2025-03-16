@@ -48,6 +48,7 @@ function UserDashboard() {
     }
   };
 
+  //FIXME: change the delete file function
   const handleDeleteFile = async (file) => {
     try {
       // Delete from Firebase Storage
@@ -87,19 +88,23 @@ function UserDashboard() {
   return (
     <>
       <div className='flex justify-between p-4 bg-blue-500'>
-        <div className='flex items-center gap-2'>
-          <img
-            src={user?.photoURL}
-            alt='profile photo'
-            className='w-5 h-5 rounded-full '
-          />
-          <h2 className='text-white'>{user?.displayName}</h2>
+        <div className='flex gap-4'>
+          <Link to='/'>
+            <button className='text-white cursor-pointer'>Home</button>
+          </Link>
+          <div className='flex items-center gap-2'>
+            <img
+              src={user?.photoURL}
+              alt='profile photo'
+              className='w-5 h-5 rounded-full '
+            />
+            <h2 className='text-white'>{user?.displayName}</h2>
+          </div>
         </div>
         <button className='text-white cursor-pointer' onClick={handleLogout}>
           Logout
         </button>
       </div>
-
       <UploadModel />
       <div className='p-2'>
         {/* list all files that this user has */}

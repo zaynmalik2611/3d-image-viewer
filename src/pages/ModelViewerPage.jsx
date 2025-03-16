@@ -7,9 +7,11 @@ function ModelViewerPage() {
 
   return (
     <div>
-      <h1>Model Viewer Page</h1>
-      <h2>{modelName}</h2>
-      <ModelViewer modelName={modelName} />
+      <h1 className='text-center text-2xl'>Model Viewer Page</h1>
+      <h2 className='pl-4'>{modelName}</h2>
+      <div className='flex justify-center'>
+        <ModelViewer modelName={modelName} />
+      </div>
     </div>
   );
 }

@@ -15,6 +15,7 @@ function App() {
       {/* TODO: improve the userdashboard page */}
       {/* TODO: make a user feed page */}
       {/* TODO: implement the like functionality in the app */}
+      {/* TODO: implement limits on usage */}
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/models/:modelName' element={<ModelViewerPage />} />

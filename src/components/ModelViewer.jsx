@@ -27,7 +27,7 @@ const ModelViewer = ({ modelName }) => {
         ar
         auto-rotate
         camera-controls
-        style={{ width: '800px', height: '700px' }}
+        style={{ width: '800px', height: '600px' }}
       />
     </div>
   );
