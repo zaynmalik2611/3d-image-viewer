@@ -4,7 +4,6 @@ import ModelViewer from '../components/ModelViewer';
 
 function ModelViewerPage() {
   const { fileId } = useParams();
-
   return (
     <div>
       <div className='flex justify-between mt-1 p-1'>

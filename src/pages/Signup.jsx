@@ -20,6 +20,7 @@ const SignupPage = () => {
     <>
       <h1 className='text-center text-2xl'>3d Image Viewer</h1>
       <div className='flex flex-col items-center justify-center h-screen'>
+        {/* TODO: improve button styling */}
         <button
           onClick={handleGoogleSignIn}
           className='mt-4 bg-blue-500 text-white p-2 rounded'

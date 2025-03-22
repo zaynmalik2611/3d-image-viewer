@@ -7,7 +7,7 @@ function ImagesGrid({ isLoading, files, userId }) {
       <div className='grid grid-cols-2 sm:grid-cols-3 mt-8  gap-4'>
         {Array.from({ length: 9 }).map((_, i) => (
           <div key={i} className='flex justify-center'>
-            <div className='w-44 h-44 bg-gray-400 animate-pulse rounded'></div>
+            <div className='w-60 h-64 bg-gray-400 animate-pulse rounded'></div>
           </div>
         ))}
       </div>
@@ -22,7 +22,7 @@ function ImagesGrid({ isLoading, files, userId }) {
               fileName={file.fileName}
               filethumbnailUrl={file.thumbnailUrl}
               userId={userId}
-              //   isLiked={file.isLiked}
+              isLiked={file.isLiked}
             />
           </div>
         ))}

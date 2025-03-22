@@ -15,10 +15,12 @@
     "@react-three/fiber": "^9.0.4",
     "@tailwindcss/vite": "^4.0.9",
     "firebase": "^11.4.0",
+    "lucide-react": "^0.483.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-firebase-hooks": "^5.1.1",
     "react-router-dom": "^6.30.0",
+    "sonner": "^2.0.1",
     "tailwindcss": "^4.0.9",
     "three": "^0.169.0",
     "uuid": "^11.1.0"

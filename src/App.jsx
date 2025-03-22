@@ -10,10 +10,11 @@ function App() {
   return (
     <>
       {/* CHORE: understand the firebase security settings and configure the values */}
-      {/* TODO: implement the like functionality in the app */}
       {/* TODO: implement limits on usage */}
       <Routes>
-        <Route path='/' element={<HomePage />} />
+        <Route element={<PrivateRoute />}>
+          <Route path='/' element={<HomePage />} />
+        </Route>
         <Route path='/models/:fileId' element={<ModelViewerPage />} />
         <Route element={<PrivateRoute />}>
           <Route path='/dashboard' element={<UserDashboard />} />

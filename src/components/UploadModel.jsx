@@ -9,11 +9,11 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import React, { useRef, useState } from 'react';
 import { auth, storage, db } from '../firebase';
+import { Camera } from 'lucide-react';
 
 function UploadModel({ setRefresh }) {
   const modelViewerRef = useRef();
   const [file, setFile] = useState(null);
-  const [downloadUrl, setDownloadUrl] = useState('');
   const [modelProgress, setModelProgress] = useState(0);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [thumbnailProgress, setThumbnailProgress] = useState(0);
@@ -55,6 +55,7 @@ function UploadModel({ setRefresh }) {
     });
   };
 
+  // TODO: implement error handling
   const handleFileUpload = async () => {
     if (!file) {
       alert('Please select a file first!');
@@ -135,6 +136,7 @@ function UploadModel({ setRefresh }) {
           Choose File
           <input type='file' className='hidden' onChange={handleFileChange} />
         </label>
+        {/* TODO: add a save icon */}
         <button
           className='bg-gray-900 text-white cursor-pointer rounded-sm p-2'
           onClick={handleFileUpload}
@@ -143,34 +145,13 @@ function UploadModel({ setRefresh }) {
         </button>
       </div>
 
-      <div className='grid grid-cols-3 gap-4'>
-        <div className='flex justify-end'>
-          {thumbnailFile && (
-            <>
-              <img
-                src={URL.createObjectURL(thumbnailFile)}
-                alt='Thumbnail Preview'
-                width={300}
-                height={200}
-              />
-            </>
-          )}
-        </div>
-        <div className='flex justify-center items-center'>
-          {file && (
-            <button
-              className='p-2 rounded-sm bg-gray-900 h-10 text-white'
-              onClick={captureThumbnail}
-            >
-              {/* TODO: replace with camera icon */}
-              Capture Thumbnail
-            </button>
-          )}
-        </div>
-        <div>
+      {/* TODO: improve styling by making thumbnail small and the actual model large. Also exchange their positioning. */}
+      <div className='flex justify-between gap-4'>
+        <div className='flex justify-center w-5/12'>
           <model-viewer
             ref={modelViewerRef}
-            style={{ width: 300, height: 300 }}
+            // className='w-80'
+            style={{ width: 450, height: 450 }}
             camera-controls
             auto-rotate
             exposure='1'
@@ -179,20 +160,46 @@ function UploadModel({ setRefresh }) {
             onLoadStart={() => setThumbnailFile(null)}
           />
         </div>
-      </div>
-      <div className='flex justify-center mt-4'>
-        <div className='w-full max-w-sm'>
-          <div className=' bg-gray-200 rounded-full h-3'>
-            <div
-              className='bg-gray-900 h-3 rounded-full transition-all'
-              style={{ width: `${modelProgress}%` }}
-            ></div>
+        <div className='flex justify-center items-center w-2/12'>
+          {file && (
+            <button
+              className='p-2 rounded-sm cursor-pointer bg-gray-900 h-10 text-white'
+              onClick={captureThumbnail}
+            >
+              <Camera color='white' size={24} />
+            </button>
+          )}
+        </div>
+        <div className='flex flex-col justify-center w-5/12'>
+          <div className='flex justify-center '>
+            {thumbnailFile && (
+              <>
+                <img
+                  src={URL.createObjectURL(thumbnailFile)}
+                  alt='Thumbnail Preview'
+                  width={200}
+                  height={200}
+                />
+              </>
+            )}
           </div>
-          <p className='text-sm text-gray-600 mt-1 text-center'>
-            {modelProgress.toFixed(2)}% uploaded
-          </p>
         </div>
       </div>
+      {file && (
+        <div className='flex justify-center mt-4'>
+          <div className='w-full max-w-sm'>
+            <div className=' bg-gray-200 rounded-full h-3'>
+              <div
+                className='bg-gray-900 h-3 rounded-full transition-all'
+                style={{ width: `${modelProgress}%` }}
+              ></div>
+            </div>
+            <p className='text-sm text-gray-600 mt-1 text-center'>
+              {modelProgress.toFixed(2)}% uploaded
+            </p>
+          </div>
+        </div>
+      )}
     </>
   );
 }
