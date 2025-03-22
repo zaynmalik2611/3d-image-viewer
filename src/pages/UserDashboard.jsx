@@ -48,17 +48,20 @@ function UserDashboard() {
     }
   };
 
-  //FIXME: change the delete file function
   const handleDeleteFile = async (file) => {
     try {
+      await deleteDoc(doc(db, 'files', file.id));
       // Delete from Firebase Storage
       const fileRef = ref(storage, `/${file.modelName}`);
       await deleteObject(fileRef);
 
-      const thumbnailRef = ref(storage, `/thumbnails/${file.thumbnail}`);
-
+      const thumbnailRef = ref(
+        storage,
+        `/thumbnails/${file.thumbnailFileName}`
+      );
+      await deleteObject(thumbnailRef);
       // Delete metadata from Firestore
-      await deleteDoc(doc(db, 'files', file.id));
+
       setRefresh((refresh) => refresh + 1);
       console.log('File deleted successfully');
       // Optionally update state to reflect changes
@@ -89,7 +92,7 @@ function UserDashboard() {
   console.log('user', user?.photoURL);
   return (
     <>
-      <div className='flex justify-between p-4 bg-blue-500'>
+      <div className='flex justify-between p-4 bg-gray-900'>
         <div className='flex gap-4'>
           <Link to='/'>
             <button className='text-white cursor-pointer'>Home</button>
@@ -107,7 +110,7 @@ function UserDashboard() {
           Logout
         </button>
       </div>
-      <UploadModel />
+      <UploadModel setRefresh={setRefresh} />
       <div className='p-2'>
         {/* list all files that this user has */}
         {userFiles.map((file) => (
@@ -119,7 +122,7 @@ function UserDashboard() {
               <h2>{file.fileName}</h2>
             </Link>
             <button
-              className='bg-red-500 text-white p-2 rounded-md'
+              className='bg-red-500 cursor-pointer text-white p-2 rounded-md'
               onClick={() => handleDeleteFile(file)}
             >
               {/* TODO add trash icon */}

@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import React, { useRef, useState } from 'react';
 import { auth, storage, db } from '../firebase';
 
-function UploadModel() {
+function UploadModel({ setRefresh }) {
   const modelViewerRef = useRef();
   const [file, setFile] = useState(null);
   const [downloadUrl, setDownloadUrl] = useState('');
@@ -88,17 +88,16 @@ function UploadModel() {
       userId: user.uid,
       uploadedAt: serverTimestamp(),
       thumbnailUrl: '',
+      thumbnailFileName: '',
     });
 
     if (thumbnailFile) {
       const thumbnailExtension = thumbnailFile.name
         .slice(thumbnailFile.name.lastIndexOf('.'))
         .toLowerCase();
+      const thumbnailFileName = uuidv4() + thumbnailExtension;
+      const thumbStorageRef = ref(storage, `/thumbnails/${thumbnailFileName}`);
 
-      const thumbStorageRef = ref(
-        storage,
-        `/thumbnails/${uuidv4() + thumbnailExtension}`
-      );
       const thumbUploadTask = uploadBytesResumable(
         thumbStorageRef,
         thumbnailFile
@@ -107,11 +106,12 @@ function UploadModel() {
         thumbUploadTask,
         setThumbnailProgress
       );
-      // TODO: add a thumbnail modelName to improve the delete functionality
       const docRef = doc(db, 'files', savedFileDoc.id);
       await updateDoc(docRef, {
         thumbnailUrl: thumbnailDownloadUrl,
+        thumbnailFileName,
       });
+      setRefresh((refresh) => refresh + 1);
       console.log('File + thumbnail metadata saved.');
     }
   };
@@ -131,12 +131,12 @@ function UploadModel() {
     <>
       <div className='w-full flex justify-center items-center gap-4 mt-4'>
         <label htmlFor='model'>Upload model image (glb format)</label>
-        <label className='flex items-center justify-center w-full max-w-40 px-4 py-2 text-white bg-blue-600 rounded-lg cursor-pointer hover:bg-blue-700 transition-all'>
+        <label className='flex items-center justify-center w-full max-w-40 px-4 py-2 text-white bg-gray-900 rounded-lg cursor-pointer hover:bg-gray-950 transition-all'>
           Choose File
           <input type='file' className='hidden' onChange={handleFileChange} />
         </label>
         <button
-          className='bg-blue-600 text-white rounded-sm p-2'
+          className='bg-gray-900 text-white cursor-pointer rounded-sm p-2'
           onClick={handleFileUpload}
         >
           Upload File
@@ -159,7 +159,7 @@ function UploadModel() {
         <div className='flex justify-center items-center'>
           {file && (
             <button
-              className='p-2 rounded-sm bg-blue-500 h-10 text-white'
+              className='p-2 rounded-sm bg-gray-900 h-10 text-white'
               onClick={captureThumbnail}
             >
               {/* TODO: replace with camera icon */}
@@ -184,7 +184,7 @@ function UploadModel() {
         <div className='w-full max-w-sm'>
           <div className=' bg-gray-200 rounded-full h-3'>
             <div
-              className='bg-blue-600 h-3 rounded-full transition-all'
+              className='bg-gray-900 h-3 rounded-full transition-all'
               style={{ width: `${modelProgress}%` }}
             ></div>
           </div>

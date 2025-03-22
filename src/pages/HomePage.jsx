@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../firebase';
+import { auth, db } from '../firebase';
 import { Link } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
+import ImagesGrid from '../components/ImagesGrid';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 function HomePage() {
   const [files, setFiles] = useState([]);
+  const [isLoading, setisLoading] = useState(false);
+  const [user] = useAuthState(auth);
 
   const getImagesNameFromFirebase = async () => {
     try {
@@ -22,49 +26,36 @@ function HomePage() {
   };
   useEffect(() => {
     (async () => {
+      setisLoading(true);
       const filesFromStorage = await getImagesNameFromFirebase();
+      console.log('filesFromStorage', filesFromStorage);
       setFiles(filesFromStorage);
+      setisLoading(false);
     })();
   }, []);
   console.log('files', files);
   return (
-    <>
-      <div className='grid grid-cols-3 mt-2'>
-        <div className='flex justify-start pl-4'>
+    <div className='bg-gray-900 h-screen'>
+      <div className='grid grid-cols-3 items-center  px-4 py-2 text-white '>
+        <div className='flex justify-start'>
           <Link to='/dashboard'>
-            <button className='bg-blue-500 cursor-pointer text-white px-4 py-2 rounded-sm'>
+            <span className='text-white font-bold text-xl cursor-pointer transition rounded-lg'>
               Dashboard
-            </button>
+            </span>
           </Link>
         </div>
-        <h1 className='text-center text-2xl'>Welcome to 3d viewer app</h1>
-        <div></div>
+        <h1 className='text-center text-2xl font-bold tracking-wide'>
+          3D Viewer App
+        </h1>
+        <div />
       </div>
 
-      {/* TODO: limit the image showing to 10 images */}
+      {/* TODO: limit the image showing to 9 images */}
+      {/* TODO: improve the design of the page */}
       {/* TODO: load more images by moving to the end of the page */}
-      {/* TODO: add a loader when the images are loading */}
 
-      <div className='grid grid-cols-2 sm:grid-cols-3 mt-8  gap-4'>
-        {files.length ? (
-          files.map((file, index) => (
-            <div className='flex justify-center' key={index}>
-              <Link to={`/models/${file.id}`} className='flex flex-col'>
-                <img
-                  src={file.thumbnailUrl || '/public/assets/thumbnail.jpg'}
-                  className='w-44 h-44'
-                />
-                <span className='underline text-blue-600 hover:text-blue-400'>
-                  {file.fileName}
-                </span>
-              </Link>
-            </div>
-          ))
-        ) : (
-          <></>
-        )}
-      </div>
-    </>
+      <ImagesGrid isLoading={isLoading} files={files} userId={user?.uid} />
+    </div>
   );
 }
 
