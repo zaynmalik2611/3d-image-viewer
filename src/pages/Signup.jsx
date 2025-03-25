@@ -28,7 +28,7 @@ const SignupPage = () => {
           className='mt-6 flex items-center justify-center gap-3 bg-white text-gray-700 border border-gray-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-in-out font-semibold py-2 px-6 rounded-xl cursor-pointer'
         >
           <img
-            src='/src/assets/google-icon.svg'
+            src='/public/assets/google-icon.svg'
             alt='Google logo'
             className='w-5 h-5'
           />
