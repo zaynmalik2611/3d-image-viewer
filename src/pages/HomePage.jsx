@@ -104,3 +104,11 @@ function HomePage() {
 }
 
 export default HomePage;
+
+[
+  {
+    origin: ['*'],
+    method: ['GET'],
+    maxAgeSeconds: 3600,
+  },
+];
