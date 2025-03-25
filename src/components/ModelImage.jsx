@@ -63,7 +63,7 @@ function ModelImage({ fileId, filethumbnailUrl, fileName, userId, isLiked }) {
       <div className='flex flex-col shadow-md p-2 rounded-lg'>
         <Link to={`/models/${fileId}`} className='flex flex-col'>
           <img
-            src={filethumbnailUrl || '/public/assets/thumbnail.jpg'}
+            src={filethumbnailUrl || '/assets/thumbnail.jpg'}
             className='w-44 h-44'
           />
           <span className='text-gray-900  hover:text-gray-700 transition-colors duration-200 cursor-pointer'>
