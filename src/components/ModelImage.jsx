@@ -27,7 +27,6 @@ function ModelImage({ fileId, filethumbnailUrl, fileName, userId, isLiked }) {
         likedFiles: arrayUnion(fileId),
       });
     } catch (error) {
-      console.log('error', error);
       void error;
       setIsImageLiked(false);
     }

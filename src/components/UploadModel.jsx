@@ -17,7 +17,7 @@ function UploadModel({ setRefresh }) {
   const [file, setFile] = useState(null);
   const [modelProgress, setModelProgress] = useState(0);
   const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [thumbnailProgress, setThumbnailProgress] = useState(0);
+  const [, setThumbnailProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
   const captureThumbnail = async () => {

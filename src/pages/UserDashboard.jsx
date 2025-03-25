@@ -67,7 +67,6 @@ function UserDashboard() {
       // Delete metadata from Firestore
 
       setRefresh((refresh) => refresh + 1);
-      console.log('File deleted successfully');
       // Optionally update state to reflect changes
     } catch (error) {
       console.error('Error deleting file:', error);
@@ -78,15 +77,12 @@ function UserDashboard() {
     try {
       const auth = getAuth();
       await signOut(auth);
-      console.log('User signed out');
       navigate('/auth');
       // Optionally redirect or update UI here
     } catch (error) {
       console.error('Error signing out:', error);
     }
   };
-
-  console.log('files', userFiles);
 
   useEffect(() => {
     (async () => {
@@ -95,7 +91,6 @@ function UserDashboard() {
       setFilesLoading(false);
     })();
   }, [refresh]);
-  console.log('user', user?.photoURL);
   return (
     <>
       <div className='flex justify-between p-4 bg-gray-900'>

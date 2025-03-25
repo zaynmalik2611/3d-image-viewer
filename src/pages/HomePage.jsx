@@ -71,7 +71,6 @@ function HomePage() {
     })();
   }, [loading, user, doFetch]);
 
-  console.log('files', files);
   return (
     <div>
       <div className='grid grid-cols-3 items-center px-6 py-3 bg-white text-gray-900'>
