@@ -9,7 +9,8 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import React, { useRef, useState } from 'react';
 import { auth, storage, db } from '../firebase';
-import { Camera } from 'lucide-react';
+import { Camera, Save } from 'lucide-react';
+import { toast, Toaster } from 'sonner';
 
 function UploadModel({ setRefresh }) {
   const modelViewerRef = useRef();
@@ -54,66 +55,84 @@ function UploadModel({ setRefresh }) {
       );
     });
   };
-
-  // TODO: implement error handling
+  // TODO: add toast to show that upload is completed
   const handleFileUpload = async () => {
     if (!file) {
-      alert('Please select a file first!');
+      toast.error('Please select a file first!');
       return;
     }
     const fileExtension = file.name
       .slice(file.name.lastIndexOf('.'))
       .toLowerCase();
     if (fileExtension !== '.glb') {
-      alert('Only .glb models are allowed for now.');
+      toast.error('Only .glb models are allowed.');
       setFile(null);
       return;
     }
     const user = auth.currentUser;
     if (!user) {
-      alert('You need to be logged in to upload files.');
+      toast.error('You need to be logged in to upload files.');
       return;
     }
     const modelFileName = uuidv4() + fileExtension;
     const storageRef = ref(storage, `/${modelFileName}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
-    const fileDownloadUrl = await uploadWithProgress(
-      uploadTask,
-      setModelProgress
-    );
-    const savedFileDoc = await addDoc(collection(db, 'files'), {
-      fileName: file.name,
-      modelName: modelFileName,
-      fileURL: fileDownloadUrl,
-      userId: user.uid,
-      uploadedAt: serverTimestamp(),
-      thumbnailUrl: '',
-      thumbnailFileName: '',
-    });
+    let fileDownloadUrl = '';
+    try {
+      fileDownloadUrl = await uploadWithProgress(uploadTask, setModelProgress);
+    } catch (error) {
+      void error;
+      toast.error('Model upload failed! Please try again.');
+      return;
+    }
+
+    let savedFileDoc = null;
+    try {
+      savedFileDoc = await addDoc(collection(db, 'files'), {
+        fileName: file.name,
+        modelName: modelFileName,
+        fileURL: fileDownloadUrl,
+        userId: user.uid,
+        uploadedAt: serverTimestamp(),
+        thumbnailUrl: '',
+        thumbnailFileName: '',
+      });
+    } catch (error) {
+      void error;
+      toast.error('Model upload failed! Please try again.');
+      return;
+    }
 
     if (thumbnailFile) {
-      const thumbnailExtension = thumbnailFile.name
-        .slice(thumbnailFile.name.lastIndexOf('.'))
-        .toLowerCase();
-      const thumbnailFileName = uuidv4() + thumbnailExtension;
-      const thumbStorageRef = ref(storage, `/thumbnails/${thumbnailFileName}`);
+      try {
+        const thumbnailExtension = thumbnailFile.name
+          .slice(thumbnailFile.name.lastIndexOf('.'))
+          .toLowerCase();
+        const thumbnailFileName = uuidv4() + thumbnailExtension;
+        const thumbStorageRef = ref(
+          storage,
+          `/thumbnails/${thumbnailFileName}`
+        );
 
-      const thumbUploadTask = uploadBytesResumable(
-        thumbStorageRef,
-        thumbnailFile
-      );
-      const thumbnailDownloadUrl = await uploadWithProgress(
-        thumbUploadTask,
-        setThumbnailProgress
-      );
-      const docRef = doc(db, 'files', savedFileDoc.id);
-      await updateDoc(docRef, {
-        thumbnailUrl: thumbnailDownloadUrl,
-        thumbnailFileName,
-      });
-      setRefresh((refresh) => refresh + 1);
-      console.log('File + thumbnail metadata saved.');
+        const thumbUploadTask = uploadBytesResumable(
+          thumbStorageRef,
+          thumbnailFile
+        );
+        const thumbnailDownloadUrl = await uploadWithProgress(
+          thumbUploadTask,
+          setThumbnailProgress
+        );
+        const docRef = doc(db, 'files', savedFileDoc?.id);
+        await updateDoc(docRef, {
+          thumbnailUrl: thumbnailDownloadUrl,
+          thumbnailFileName,
+        });
+        setRefresh((refresh) => refresh + 1);
+        console.log('File + thumbnail metadata saved.');
+      } catch (error) {
+        void error;
+      }
     }
   };
 
@@ -126,8 +145,6 @@ function UploadModel({ setRefresh }) {
     }
   };
 
-  // TODO: do styling improvements
-
   return (
     <>
       <div className='w-full flex justify-center items-center gap-4 mt-4'>
@@ -136,21 +153,18 @@ function UploadModel({ setRefresh }) {
           Choose File
           <input type='file' className='hidden' onChange={handleFileChange} />
         </label>
-        {/* TODO: add a save icon */}
         <button
           className='bg-gray-900 text-white cursor-pointer rounded-sm p-2'
           onClick={handleFileUpload}
         >
-          Upload File
+          <Save />
         </button>
       </div>
 
-      {/* TODO: improve styling by making thumbnail small and the actual model large. Also exchange their positioning. */}
       <div className='flex justify-between gap-4'>
         <div className='flex justify-center w-5/12'>
           <model-viewer
             ref={modelViewerRef}
-            // className='w-80'
             style={{ width: 450, height: 450 }}
             camera-controls
             auto-rotate
@@ -200,6 +214,11 @@ function UploadModel({ setRefresh }) {
           </div>
         </div>
       )}
+      <Toaster
+        position='top-right'
+        closeButton={true}
+        toastOptions={{ duration: 1000 }}
+      />
     </>
   );
 }

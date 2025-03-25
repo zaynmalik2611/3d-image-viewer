@@ -15,6 +15,7 @@ function ImagesGrid({ isLoading, files, userId }) {
   if (files.length) {
     return (
       <div className='grid grid-cols-2 sm:grid-cols-3 mt-8  gap-4'>
+        {/* TODO: make the images styling consistent */}
         {files.map((file, index) => (
           <div className='flex justify-center' key={index}>
             <ModelImage

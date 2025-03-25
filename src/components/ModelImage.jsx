@@ -6,12 +6,13 @@ import {
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { db } from '../firebase';
 import { Link } from 'react-router-dom';
 
 function ModelImage({ fileId, filethumbnailUrl, fileName, userId, isLiked }) {
   const [isImageLiked, setIsImageLiked] = useState(isLiked);
+  const isThrottled = useRef(false);
 
   const likeFile = async (userId, fileId) => {
     // OPTIMIZE: optimize the like functionality
@@ -42,6 +43,21 @@ function ModelImage({ fileId, filethumbnailUrl, fileName, userId, isLiked }) {
       setIsImageLiked(true);
     }
   };
+
+  const handleLikeClick = (userId, fileId) => {
+    if (isThrottled.current) return;
+    isThrottled.current = true;
+
+    setTimeout(() => {
+      isThrottled.current = false;
+    }, 1000);
+
+    if (isImageLiked) {
+      unlikeFile(userId, fileId);
+    } else {
+      likeFile(userId, fileId);
+    }
+  };
   return (
     <>
       <div className='flex flex-col shadow-md p-2 rounded-lg'>
@@ -55,14 +71,7 @@ function ModelImage({ fileId, filethumbnailUrl, fileName, userId, isLiked }) {
           </span>
         </Link>
         <button
-          onClick={() => {
-            // IMPROVE: throttle likes and unlike clicks so user can't exploit it
-            if (isImageLiked) {
-              unlikeFile(userId, fileId);
-            } else {
-              likeFile(userId, fileId);
-            }
-          }}
+          onClick={() => handleLikeClick(userId, fileId)}
           className='text-gray-900 cursor-pointer mt-2'
         >
           {isImageLiked ? 'Liked' : 'Like'}

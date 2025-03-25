@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
 import { Link } from 'react-router-dom';
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+} from 'firebase/firestore';
 import ImagesGrid from '../components/ImagesGrid';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Toaster, toast } from 'sonner';
@@ -10,13 +19,34 @@ function HomePage() {
   const [files, setFiles] = useState([]);
   const [isLoading, setisLoading] = useState(true);
   const [user, loading] = useAuthState(auth);
+  const [lastSnapShot, setLastSnapShot] = useState(null);
+  const [doFetch, setDoFetch] = useState(0);
+  const [showFetchMore, setShowFetchMore] = useState(true);
 
   const getImagesNameFromFirebase = async () => {
     try {
       // LEARN: learn firebase syntax and how it works
-      const querySnapshot = await getDocs(collection(db, 'files'));
+
+      const q = lastSnapShot
+        ? query(
+            collection(db, 'files'),
+            orderBy('uploadedAt', 'desc'),
+            startAfter(lastSnapShot),
+            limit(9)
+          )
+        : query(
+            collection(db, 'files'),
+            orderBy('uploadedAt', 'desc'),
+            limit(9)
+          );
+      const querySnapshot = await getDocs(q);
+      const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+      if (querySnapshot.empty) {
+        setShowFetchMore(false);
+        return [];
+      }
+      setLastSnapShot(lastVisible);
       const likesSnap = await getDoc(doc(db, 'userLikes', user?.uid));
-      console.log('likesSnap', likesSnap);
       const likedFiles = likesSnap.exists() ? likesSnap.data().likedFiles : [];
       const data = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -33,12 +63,14 @@ function HomePage() {
 
   useEffect(() => {
     (async () => {
+      // loading is actually auth status loading
       if (loading || !user) return;
       const filesFromStorage = await getImagesNameFromFirebase();
-      setFiles(filesFromStorage);
+      setFiles([...files, ...filesFromStorage]);
       setisLoading(false);
     })();
-  }, [loading, user]);
+  }, [loading, user, doFetch]);
+
   console.log('files', files);
   return (
     <div>
@@ -50,16 +82,23 @@ function HomePage() {
             </span>
           </Link>
         </div>
-        <h1 className='text-center text-2xl font-extrabold tracking-wide'>
-          3D Viewer App
+        <h1 className=' text-center text-4xl font-extrabold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 text-transparent bg-clip-text drop-shadow-lg tracking-wide  '>
+          DepthView
         </h1>
-        <div />
       </div>
 
-      {/* TODO: limit the image showing to 9 images */}
-      {/* TODO: load more images by moving to the end of the page */}
-
       <ImagesGrid isLoading={isLoading} files={files} userId={user?.uid} />
+      {showFetchMore && (
+        <div className='flex justify-center my-4'>
+          <button
+            onClick={() => setDoFetch((doFetch) => doFetch + 1)}
+            className='bg-gray-800 text-white cursor-pointer rounded-md p-4'
+          >
+            Fetch More
+          </button>
+        </div>
+      )}
+
       <Toaster position='top-right' />
     </div>
   );

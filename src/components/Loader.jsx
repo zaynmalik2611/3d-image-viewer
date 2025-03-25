@@ -5,7 +5,7 @@ export default function Loader({ height, width }) {
         aria-hidden='true'
         className={`inline ${height ? height : 'h-14'}  ${
           width ? width : 'w-14'
-        }  text-gray-900 animate-spin dark:text-btnUpperGradient fill-btnUpperGradient dark:fill-gray-900`}
+        }  text-gray-900 animate-spin fill-gray-200`}
         viewBox='0 0 100 101'
         fill='none'
         xmlns='http://www.w3.org/2000/svg'

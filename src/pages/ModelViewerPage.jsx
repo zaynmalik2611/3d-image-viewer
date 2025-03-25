@@ -12,7 +12,9 @@ function ModelViewerPage() {
             Back
           </button>
         </Link>
-        <h1 className='text-center text-2xl'>Model Viewer Page</h1>
+        <h1 className='text-center text-4xl font-extrabold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 text-transparent bg-clip-text drop-shadow-lg tracking-wide '>
+          DepthView
+        </h1>
         <div></div>
       </div>
       <div className='flex justify-center'>

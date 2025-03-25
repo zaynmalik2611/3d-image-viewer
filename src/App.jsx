@@ -11,6 +11,7 @@ function App() {
     <>
       {/* CHORE: understand the firebase security settings and configure the values */}
       {/* TODO: implement limits on usage */}
+      {/* TODO: remove all consoles before pushing code */}
       <Routes>
         <Route element={<PrivateRoute />}>
           <Route path='/' element={<HomePage />} />

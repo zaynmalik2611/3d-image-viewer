@@ -114,7 +114,8 @@ function UserDashboard() {
       <UploadModel setRefresh={setRefresh} />
       <div className='flex justify-center'>
         <div className='p-2 flex flex-col gap-4'>
-          {/* list all files that this user has */}
+          {/* TODO: ADD loader until files loading */}
+          {/* TODO: improve styling make it properly aligned */}
           {userFiles.map((file) => (
             <div key={file.id} className='flex items-center gap-2'>
               <Link
