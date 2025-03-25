@@ -18,6 +18,7 @@ function UploadModel({ setRefresh }) {
   const [modelProgress, setModelProgress] = useState(0);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [thumbnailProgress, setThumbnailProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   const captureThumbnail = async () => {
     const viewer = modelViewerRef.current;
@@ -55,7 +56,6 @@ function UploadModel({ setRefresh }) {
       );
     });
   };
-  // TODO: add toast to show that upload is completed
   const handleFileUpload = async () => {
     if (!file) {
       toast.error('Please select a file first!');
@@ -69,9 +69,11 @@ function UploadModel({ setRefresh }) {
       setFile(null);
       return;
     }
+    setIsUploading(true);
     const user = auth.currentUser;
     if (!user) {
       toast.error('You need to be logged in to upload files.');
+      setIsUploading(false);
       return;
     }
     const modelFileName = uuidv4() + fileExtension;
@@ -83,6 +85,7 @@ function UploadModel({ setRefresh }) {
       fileDownloadUrl = await uploadWithProgress(uploadTask, setModelProgress);
     } catch (error) {
       void error;
+      setIsUploading(false);
       toast.error('Model upload failed! Please try again.');
       return;
     }
@@ -98,9 +101,12 @@ function UploadModel({ setRefresh }) {
         thumbnailUrl: '',
         thumbnailFileName: '',
       });
+      toast.success('Model uploaded successfully!');
+      setModelProgress(0);
     } catch (error) {
       void error;
       toast.error('Model upload failed! Please try again.');
+      setIsUploading(false);
       return;
     }
 
@@ -129,11 +135,13 @@ function UploadModel({ setRefresh }) {
           thumbnailFileName,
         });
         setRefresh((refresh) => refresh + 1);
-        console.log('File + thumbnail metadata saved.');
+        setThumbnailProgress(0);
       } catch (error) {
         void error;
+        setIsUploading(false);
       }
     }
+    setIsUploading(false);
   };
 
   const handleFileChange = (e) => {
@@ -151,11 +159,17 @@ function UploadModel({ setRefresh }) {
         <label htmlFor='model'>Upload model image (glb format)</label>
         <label className='flex items-center justify-center w-full max-w-40 px-4 py-2 text-white bg-gray-900 rounded-lg cursor-pointer hover:bg-gray-950 transition-all'>
           Choose File
-          <input type='file' className='hidden' onChange={handleFileChange} />
+          <input
+            type='file'
+            disabled={isUploading}
+            className='hidden'
+            onChange={handleFileChange}
+          />
         </label>
         <button
           className='bg-gray-900 text-white cursor-pointer rounded-sm p-2'
           onClick={handleFileUpload}
+          disabled={isUploading}
         >
           <Save />
         </button>
@@ -178,6 +192,7 @@ function UploadModel({ setRefresh }) {
           {file && (
             <button
               className='p-2 rounded-sm cursor-pointer bg-gray-900 h-10 text-white'
+              disabled={isUploading}
               onClick={captureThumbnail}
             >
               <Camera color='white' size={24} />
@@ -217,7 +232,7 @@ function UploadModel({ setRefresh }) {
       <Toaster
         position='top-right'
         closeButton={true}
-        toastOptions={{ duration: 1000 }}
+        toastOptions={{ duration: 1500 }}
       />
     </>
   );

@@ -27,6 +27,7 @@ function ModelImage({ fileId, filethumbnailUrl, fileName, userId, isLiked }) {
         likedFiles: arrayUnion(fileId),
       });
     } catch (error) {
+      console.log('error', error);
       void error;
       setIsImageLiked(false);
     }
@@ -67,7 +68,7 @@ function ModelImage({ fileId, filethumbnailUrl, fileName, userId, isLiked }) {
             className='w-44 h-44'
           />
           <span className='text-gray-900  hover:text-gray-700 transition-colors duration-200 cursor-pointer'>
-            {fileName}
+            {fileName.length > 20 ? fileName.slice(0, 20) + '...' : fileName}
           </span>
         </Link>
         <button

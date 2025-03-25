@@ -13,10 +13,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { deleteObject } from 'firebase/storage';
 import { getAuth, signOut } from 'firebase/auth';
 import { Trash2 } from 'lucide-react';
+import { Toaster } from 'sonner';
+import Loader from '../components/Loader';
 
 function UserDashboard() {
   const [userFiles, setUserFiles] = useState([]);
   const [refresh, setRefresh] = useState(0);
+  const [filesLoading, setFilesLoading] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
@@ -87,7 +90,9 @@ function UserDashboard() {
 
   useEffect(() => {
     (async () => {
+      setFilesLoading(true);
       await listUserFiles();
+      setFilesLoading(false);
     })();
   }, [refresh]);
   console.log('user', user?.photoURL);
@@ -114,25 +119,25 @@ function UserDashboard() {
       <UploadModel setRefresh={setRefresh} />
       <div className='flex justify-center'>
         <div className='p-2 flex flex-col gap-4'>
-          {/* TODO: ADD loader until files loading */}
-          {/* TODO: improve styling make it properly aligned */}
-          {userFiles.map((file) => (
-            <div key={file.id} className='flex items-center gap-2'>
-              <Link
-                className='text-gray-800 font-semibold hover:underline '
-                to={`/models/${file.id}`}
-              >
-                <h2>{file.fileName}</h2>
-              </Link>
-              {/* TODO: add a dialog for file deletion */}
-              <button
-                className='bg-red-500 cursor-pointer text-white p-2 rounded-md'
-                onClick={() => handleDeleteFile(file)}
-              >
-                <Trash2 color='white' size={16} />
-              </button>
-            </div>
-          ))}
+          {filesLoading && <Loader />}
+          {!filesLoading &&
+            userFiles.map((file) => (
+              <div key={file.id} className='flex justify-between gap-2'>
+                <Link
+                  className='text-gray-800 font-semibold hover:underline '
+                  to={`/models/${file.id}`}
+                >
+                  <h2>{file.fileName}</h2>
+                </Link>
+                {/* TODO: add a dialog for file deletion */}
+                <button
+                  className='bg-red-500 cursor-pointer text-white p-2 rounded-md'
+                  onClick={() => handleDeleteFile(file)}
+                >
+                  <Trash2 color='white' size={16} />
+                </button>
+              </div>
+            ))}
         </div>
       </div>
     </>

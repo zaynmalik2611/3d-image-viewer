@@ -9,7 +9,6 @@ import NotFound from './pages/NotFound';
 function App() {
   return (
     <>
-      {/* CHORE: understand the firebase security settings and configure the values */}
       {/* TODO: implement limits on usage */}
       {/* TODO: remove all consoles before pushing code */}
       <Routes>
